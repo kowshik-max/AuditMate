@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AuditMate – Security Controls and Compliance Gap Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#14181f;--mu:#5d6676;--bd:#e2e5ea;--pr:#2563eb;--ok:#15803d;--wa:#b45309;--er:#dc2626;--in:#7c3aed;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d0f13;--card:#171a21;--tx:#e8ebf0;--mu:#9aa3b2;--bd:#2a2f3a;--ok:#4ade80;--wa:#fbbf24;--er:#f87171;--in:#a78bfa}}
+:root[data-theme=dark]{--bg:#0d0f13;--card:#171a21;--tx:#e8ebf0;--mu:#9aa3b2;--bd:#2a2f3a;--ok:#4ade80;--wa:#fbbf24;--er:#f87171;--in:#a78bfa}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 "IBM Plex Sans",system-ui,Segoe UI,sans-serif}
+a{color:var(--pr);text-decoration:none}a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}.app.col{grid-template-columns:60px minmax(0,1fr)}
+aside{background:#000;color:#b4bac5;padding:16px 10px;position:sticky;top:0;align-self:start;height:100vh;overflow:auto}
+.brand{display:flex;gap:10px;align-items:center;color:#fff;font-weight:600;font-size:16px;padding:0 6px 4px}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--pr);display:grid;place-items:center;font-weight:700;flex:none}
+.org{font-size:12px;padding:0 6px 14px;border-bottom:1px solid #222;margin-bottom:10px;color:#8b93a1}
+aside nav a{display:flex;gap:12px;align-items:center;padding:9px 10px;border-radius:8px;color:#b4bac5;margin-bottom:2px}
+aside nav a:hover{background:#161616;text-decoration:none;color:#fff}aside nav a.on{background:#1b2a4d;color:#fff;box-shadow:inset 3px 0 var(--pr)}
+aside i{font-style:normal;width:18px;text-align:center;flex:none}
+.col aside span,.col .org,.col .brand b{display:none}
+.top{display:flex;gap:10px;align-items:center;padding:10px 24px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+.top input{max-width:340px;flex:1}
+main{padding:20px 24px 48px;max-width:1280px}
+.crumb{color:var(--mu);font-size:12px}h1{font-size:22px;margin:2px 0 2px;font-weight:600}.sub{color:var(--mu);margin:0 0 16px}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;min-width:0}
+textarea{width:100%;min-height:64px}
+button{font:inherit;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--pr)}.b1{background:var(--pr);color:#fff;border-color:var(--pr)}.sm{padding:2px 8px;font-size:12px}.dng{color:var(--er)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.grid{display:grid;gap:14px}.k6{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.kpi{cursor:pointer;text-align:left;display:block;width:100%}.kpi b{font-size:28px;display:block;font-weight:600}.kpi span{color:var(--mu);font-size:12px}
+h3{margin:0 0 10px;font-size:14px;font-weight:600}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.sp{flex:1}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;background:var(--card)}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}th{font-weight:600;color:var(--mu);cursor:pointer;font-size:12px}
+.bd{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:500}
+.g{color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}.w{color:var(--wa);background:color-mix(in srgb,var(--wa) 15%,transparent)}
+.r{color:var(--er);background:color-mix(in srgb,var(--er) 15%,transparent)}.i{color:var(--in);background:color-mix(in srgb,var(--in) 15%,transparent)}
+.mu{color:var(--mu)}.empty{padding:28px;text-align:center;color:var(--mu)}
+dialog{border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);width:min(520px,94vw);padding:20px}dialog::backdrop{background:rgba(0,0,0,.55)}
+label{display:block;font-size:12px;color:var(--mu);margin:10px 0 3px}dialog input,dialog select{width:100%}
+.err{color:var(--er);margin-top:8px}
+#toast{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:#000;color:#fff;padding:10px 16px;border-radius:8px;display:none;z-index:20;max-width:80vw}
+.mx{display:grid;grid-template-columns:auto repeat(5,1fr);gap:3px;max-width:420px}.mx div{padding:8px;text-align:center;border-radius:6px;font-weight:600}
+.kb{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.kb .card{padding:10px}.kb .card+.card{margin-top:8px}
+textarea.csv{min-height:140px;font:12px monospace}ul.l{margin:0;padding-left:18px}ul.l li{margin-bottom:4px}
+@media(max-width:800px){.app{grid-template-columns:60px minmax(0,1fr)}aside span,.org,.brand b{display:none}main,.top{padding-left:14px;padding-right:14px}}
+</style></head><body>
+<div class="app" id="app"><aside><div class="brand"><div class="logo">A</div><b>AuditMate</b></div><div class="org" id="org"></div><nav id="nv" aria-label="Main"></nav></aside>
+<div><header class="top"><button id="tg" aria-label="Collapse sidebar">☰</button><input id="gs" placeholder="Search controls…" aria-label="Search controls">
+<span class="sp"></span><button id="nt" aria-label="Notifications">🔔</button><select id="rl" aria-label="Role (demo)"><option>Admin</option><option>Analyst</option></select></header>
+<main id="v"></main></div></div><dialog id="dl"></dialog><div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),v=$('#v');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const T=new Date();T.setHours(0,0,0,0);const dd=n=>{const x=new Date(T);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)},today=dd(0);
+const CATS=['Access Control','Asset Management','Incident Management','Vulnerability Management','Network Security','Data Protection','Backup and Recovery','Security Awareness','Business Continuity','Supplier Security'];
+const CS=['Not Assessed','Implemented','Partially Implemented','Not Implemented','Not Applicable','Pending Review'],FW=['ISO/IEC 27001:2022 (illustrative)','Internal Baseline'],RL=['Low','Medium','High'];
+const GS=['Open','Triaged','In Progress','Pending Verification','Closed','Accepted Risk'],TS=['To Do','In Progress','Blocked','Pending Review','Completed'],ES=['Pending Review','Approved','Rejected'];
+const ET=['Policy document','Procedure','Screenshot','Configuration record','Training record','Audit document','Other supporting evidence'],TR=['Planned','In Progress','Treated','Accepted'];
+const cOpt=()=>S.controls.map(c=>[c.id,c.id+' · '+c.title]),gOpt=()=>['',...S.gaps.map(g=>[g.id,g.id+' · '+g.title])];
+const E={
+controls:{p:'C',name:'Control',pl:'controls',f:[['title','Title','text',0,1],['desc','Description','textarea'],['framework','Framework','select',FW],['category','Category','select',CATS],['owner','Owner','text',0,1],['status','Status','select',CS],['risk','Risk level','select',RL],['next','Next review','date']],cols:['id','title','category','owner','status','risk','next'],filt:['status','category','owner','framework']},
+evidence:{p:'E',name:'Evidence',pl:'evidence',f:[['title','Title','text',0,1],['control','Control','select',cOpt,1],['type','Type','select',ET],['by','Submitted by','text',0,1],['status','Review status','select',ES],['notes','Review notes / rejection reason','textarea'],['expiry','Expiry / next review','date']],cols:['id','title','control','type','by','status','expiry'],filt:['status','type']},
+gaps:{p:'G',name:'Gap',pl:'gaps',f:[['title','Title','text',0,1],['control','Related control','select',cOpt,1],['risk','Risk level','select',RL],['impact','Business impact','textarea'],['action','Recommended action','textarea'],['owner','Assigned owner','text',0,1],['due','Target date','date'],['status','Status','select',GS],['resolution','Resolution / verification / risk-acceptance justification','textarea']],cols:['id','title','control','risk','owner','due','status'],filt:['status','risk','owner']},
+risks:{p:'R',name:'Risk',pl:'risks',f:[['title','Title','text',0,1],['asset','Related control','select',cOpt],['cause','Threat or cause','text'],['likelihood','Likelihood (1–5)','number',0,1],['impact','Impact (1–5)','number',0,1],['safeguards','Existing safeguards','textarea'],['treatment','Proposed treatment','textarea'],['owner','Risk owner','text',0,1],['residual','Residual rating (owner-assessed)','select',['',...RL]],['review','Review date','date'],['tstatus','Treatment status','select',TR]],cols:['id','title','asset','score','owner','tstatus','review'],filt:['rating','tstatus','owner']},
+tasks:{p:'T',name:'Task',pl:'tasks',f:[['title','Title','text',0,1],['gap','Related gap','select',gOpt],['desc','Description','textarea'],['owner','Assigned owner','text',0,1],['priority','Priority','select',RL],['due','Due date','date',0,1],['status','Status','select',TS],['notes','Completion notes','textarea']],cols:['id','title','gap','owner','priority','due','status'],filt:['status','priority','owner']}};
+const H={id:'ID',score:'Score',rating:'Risk rating',next:'Next review',asset:'Control',gap:'Gap',control:'Control'};
+const BC={Implemented:'g',Approved:'g',Completed:'g',Closed:'g',Low:'g',Treated:'g','Partially Implemented':'w','Pending Review':'w','In Progress':'w',Triaged:'w',Medium:'w','Pending Verification':'w',Open:'w',Planned:'w','Not Implemented':'r',Rejected:'r',High:'r',Blocked:'r','Not Assessed':'i','Not Applicable':'i','To Do':'i','Accepted Risk':'i',Accepted:'i'};
+const bdg=x=>x?`<span class="bd ${BC[x]||'i'}">${esc(x)}</span>`:'<span class="mu">—</span>';
+const rate=s=>s>=15?'High':s>=8?'Medium':'Low';
+let S,V={q:{},f:{},s:{},pg:{},fw:'',win:30,board:0},ch=[];
+function seed(){const o=['IT Admin','Security Lead','HR Manager','Ops Manager','DPO'];
+const cs=[['Multi-factor authentication required for staff accounts','Access Control',0,'Not Implemented','High'],['Quarterly user access reviews','Access Control',1,'Partially Implemented','Medium'],['Hardware and software asset inventory','Asset Management',0,'Implemented','Medium'],['Incident response plan tested yearly','Incident Management',1,'Partially Implemented','High'],['Monthly vulnerability scanning','Vulnerability Management',0,'Implemented','High'],['Critical patches applied within 14 days','Vulnerability Management',0,'Not Implemented','High'],['Firewall rule review','Network Security',0,'Pending Review','Medium'],['Encryption of laptops','Data Protection',0,'Implemented','High'],['Daily backups with restore test','Backup and Recovery',3,'Partially Implemented','High'],['Annual security awareness training','Security Awareness',2,'Implemented','Low'],['Business continuity plan exercised','Business Continuity',3,'Not Assessed','Medium'],['Supplier security questionnaire','Supplier Security',4,'Not Implemented','Medium']];
+const x={org:'Northwind Labs (fictional demo organisation)',role:'Admin',n:{C:13,E:7,G:7,R:6,T:8},rem:90,comments:[],audit:[{t:new Date().toISOString(),u:'system',act:'Demo data loaded',rec:'—',sum:'Illustrative sample data created. Not a real audit result.'}]};
+x.controls=cs.map((c,i)=>({id:'C-'+String(i+1).padStart(3,'0'),title:c[0],desc:'Illustrative control summary (not official standard text).',framework:i%4==3?FW[1]:FW[0],category:c[1],owner:o[c[2]],status:c[3],risk:c[4],next:dd(i*9-12),reviewed:dd(-20-i*3),updated:dd(-i)}));
+const ev=[['MFA rollout plan','C-001','Procedure','IT Admin','Pending Review',''],['Access review sheet Q2','C-002','Audit document','Security Lead','Approved',dd(120)],['Asset register export','C-003','Configuration record','IT Admin','Approved',dd(60)],['IR plan v2','C-004','Policy document','Security Lead','Rejected',''],['Scanner report','C-005','Screenshot','IT Admin','Approved',dd(-10)],['Training attendance','C-010','Training record','HR Manager','Pending Review',dd(200)]];
+x.evidence=ev.map((e,i)=>({id:'E-00'+(i+1),title:e[0],control:e[1],type:e[2],by:e[3],status:e[4],notes:e[4]=='Rejected'?'Plan not tested; add exercise record.':'',expiry:e[5],reviewer:e[4]=='Pending Review'?'':'Security Lead',rdate:e[4]=='Pending Review'?'':dd(-9)}));
+const g=[['MFA missing on admin and email accounts','C-001','High','Open','IT Admin',14],['Patching exceeds 14-day target','C-006','High','In Progress','IT Admin',-5],['Incident plan never exercised','C-004','Medium','Triaged','Security Lead',30],['Restore test not documented','C-009','High','Pending Verification','Ops Manager',7],['Supplier questionnaire missing','C-012','Medium','Open','DPO',-2],['Access review is manual','C-002','Low','Closed','Security Lead',-15]];
+x.gaps=g.map((a,i)=>({id:'G-00'+(i+1),title:a[0],control:a[1],risk:a[2],impact:'Illustrative: unauthorised access or service disruption.',action:'Define and implement a remediation plan.',owner:a[4],due:dd(a[5]),status:a[3],resolution:a[3]=='Closed'?'Reviewed and verified by Security Lead.':'',idate:dd(-30)}));
+const r=[['Account takeover via phishing','C-001',4,5,'Credential theft','IT Admin'],['Ransomware outage','C-009',3,5,'Malware','Ops Manager'],['Unpatched server exploited','C-006',4,4,'Known vulnerability','IT Admin'],['Supplier data leak','C-012',2,4,'Weak supplier controls','DPO'],['Laptop theft','C-008',3,2,'Physical loss','IT Admin']];
+x.risks=r.map((a,i)=>({id:'R-00'+(i+1),title:a[0],asset:a[1],cause:a[4],likelihood:a[2],impact:a[3],score:a[2]*a[3],rating:rate(a[2]*a[3]),safeguards:'Partial controls in place.',treatment:'Mitigate',owner:a[5],residual:'',review:dd(20+i*10),tstatus:'Planned'}));
+const t=[['Enable MFA for admins','G-001','IT Admin','High',10,'In Progress'],['Roll out MFA to all staff','G-001','IT Admin','Medium',25,'To Do'],['Patch backlog clean-up','G-002','IT Admin','High',-4,'In Progress'],['Document restore test','G-004','Ops Manager','High',5,'Pending Review'],['Run tabletop exercise','G-003','Security Lead','Medium',35,'To Do'],['Send supplier questionnaires','G-005','DPO','Medium',-1,'Blocked'],['Automate access review report','G-006','Security Lead','Low',-14,'Completed']];
+x.tasks=t.map((a,i)=>({id:'T-00'+(i+1),title:a[0],gap:a[1],desc:'',owner:a[2],priority:a[3],due:dd(a[4]),status:a[5],notes:a[5]=='Completed'?'Report scheduled monthly.':''}));return x}
+try{S=JSON.parse(localStorage.getItem('am1'))}catch(e){}S=S||seed();
+const save=()=>{try{localStorage.setItem('am1',JSON.stringify(S))}catch(e){}};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3200)};
+const who=()=>S.role.toLowerCase()+'@demo';
+const log=(act,rec,sum)=>{S.audit.unshift({t:new Date().toISOString(),u:who(),act,rec,sum});save()};
+const ctl=id=>S.controls.find(c=>c.id===id);
+const isOver=(k,r)=>(k==='tasks'&&r.due<today&&r.status!=='Completed')||(k==='gaps'&&r.due&&r.due<today&&!['Closed','Accepted Risk'].includes(r.status));
+const openGap=g=>!['Closed','Accepted Risk'].includes(g.status);
+const NAV=[['dash','Overview Dashboard','◉','Your security posture, calculated from the records in this workspace.'],['fw','Compliance Frameworks','❖','Frameworks and the controls mapped to them.'],['controls','Security Controls','☷','Track every control, owner and status.'],['evidence','Evidence Management','⎙','Collect and review evidence records.'],['gaps','Compliance Gaps','⚑','Track gaps from discovery to verified closure.'],['risks','Risk Register','△','Rate risks with a documented likelihood × impact matrix.'],['tasks','Remediation Tasks','✓','Assign and follow up on fixes.'],['audit','Audit Activity','◷','Read-only log of changes made in this app.'],['reports','Reports','▤','Filter, preview and export reports.'],['settings','Settings','⚙','Organisation and workspace preferences.']];
+function cell(k,r,c){const x=r[c];
+if(c==='id'&&k==='controls')return `<a href="#control/${r.id}">${r.id}</a>`;
+if(['control','asset'].includes(c)&&x)return `<a href="#control/${esc(x)}">${esc(x)}</a>`;
+if(c==='gap'&&x)return `<a href="#gaps">${esc(x)}</a>`;
+if(c==='score')return `${r.score} ${bdg(r.rating)}`;
+if(['status','risk','priority','tstatus'].includes(c))return bdg(x)+(c==='status'&&isOver(k,r)?' <span class="bd r">Overdue</span>':'');
+if((c==='due'||c==='expiry'||c==='next'||c==='review')&&x){const late=(c==='expiry'&&x<today)||(c==='due'&&isOver(k,r));return esc(x)+(late?` <span class="bd r">${c==='expiry'?'Expired':'Overdue'}</span>`:'')}
+return esc(x)||'<span class="mu">—</span>'}
+const lab=(k,c)=>H[c]||(E[k].f.find(f=>f[0]===c)||[0,c])[1];
+const optsOf=(k,f)=>{if(f==='rating')return RL;const d=E[k].f.find(x=>x[0]===f);if(d&&Array.isArray(d[3]))return d[3].filter(Boolean);return [...new Set(S[k].map(r=>r[f]).filter(Boolean))].sort()};
+function rows(k){const q=(V.q[k]||'').toLowerCase(),f=V.f[k]||{};let a=S[k].filter(r=>(!q||Object.values(r).join(' ').toLowerCase().includes(q))&&Object.entries(f).every(([c,x])=>!x||r[c]===x));
+const s=V.s[k];if(s)a.sort((p,q2)=>(String(p[s.c]).localeCompare(String(q2[s.c]),undefined,{numeric:true}))*s.d);return a}
+function page(k){const e=E[k];V.f[k]=V.f[k]||{};
+v.innerHTML=`<div class="bar"><input id="q" placeholder="Search ${e.pl}" aria-label="Search" value="${esc(V.q[k]||'')}">${e.filt.map(f=>`<select data-f="${f}" aria-label="${lab(k,f)}"><option value="">All ${lab(k,f).toLowerCase()}</option>${optsOf(k,f).map(o=>`<option ${V.f[k][f]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`).join('')}<span class="sp"></span>${k==='tasks'?`<button id="kb">${V.board?'Table view':'Board view'}</button>`:''}<button class="b1" id="nw">+ New ${e.name.toLowerCase()}</button></div><div id="tb"></div>`;
+$('#q').oninput=x=>{V.q[k]=x.target.value;V.pg[k]=0;tbl(k)};
+v.querySelectorAll('select[data-f]').forEach(s=>s.onchange=()=>{V.f[k][s.dataset.f]=s.value;V.pg[k]=0;tbl(k)});
+$('#nw').onclick=()=>form(k);if($('#kb'))$('#kb').onclick=()=>{V.board=!V.board;page(k)};tbl(k)}
+function tbl(k){const e=E[k],a=rows(k),P=8,pg=Math.min(V.pg[k]||0,Math.max(0,Math.ceil(a.length/P)-1)),tb=$('#tb');
+if(!a.length){tb.innerHTML=`<div class="card empty">No ${e.pl} match. Adjust the filters or create a new ${e.name.toLowerCase()}.</div>`;return}
+if(k==='tasks'&&V.board){tb.innerHTML=`<div class="kb">${TS.map(s=>`<div><h3>${s} (${a.filter(r=>r.status===s).length})</h3>${a.filter(r=>r.status===s).map(r=>`<div class="card"><b>${esc(r.title)}</b><div class="mu">${esc(r.owner)} · ${esc(r.due)} ${isOver(k,r)?'<span class="bd r">Overdue</span>':''}</div><button class="sm" data-e="${r.id}">Edit</button></div>`).join('')}</div>`).join('')}</div>`}
+else tb.innerHTML=`<div class="card tw" style="padding:0"><table><thead><tr>${e.cols.map(c=>`<th data-c="${c}" tabindex="0">${lab(k,c)}${V.s[k]&&V.s[k].c===c?(V.s[k].d>0?' ▲':' ▼'):''}</th>`).join('')}<th></th></tr></thead><tbody>${a.slice(pg*P,pg*P+P).map(r=>`<tr>${e.cols.map(c=>`<td>${cell(k,r,c)}</td>`).join('')}<td>${k==='evidence'?`<button class="sm" data-r="${r.id}|Approved">Approve</button> <button class="sm" data-r="${r.id}|Rejected">Reject</button> <button class="sm" data-r="${r.id}|Pending Review">Pending</button> `:''}<button class="sm" data-e="${r.id}">Edit</button> <button class="sm dng" data-d="${r.id}">Delete</button></td></tr>`).join('')}</tbody></table></div><div class="bar" style="margin-top:10px"><span class="mu">${a.length} records</span><span class="sp"></span><button class="sm" id="pv" ${pg?'':'disabled'}>Previous</button><span>Page ${pg+1} of ${Math.ceil(a.length/P)}</span><button class="sm" id="nx" ${(pg+1)*P<a.length?'':'disabled'}>Next</button></div>`;
+tb.querySelectorAll('th[data-c]').forEach(h=>h.onclick=()=>{const s=V.s[k];V.s[k]={c:h.dataset.c,d:s&&s.c===h.dataset.c?-s.d:1};tbl(k)});
+tb.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>form(k,b.dataset.e));
+tb.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>del(k,b.dataset.d));
+tb.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>review(...b.dataset.r.split('|')));
+if($('#pv')){$('#pv').onclick=()=>{V.pg[k]=pg-1;tbl(k)};$('#nx').onclick=()=>{V.pg[k]=pg+1;tbl(k)}}}
+function review(id,st){const r=S.evidence.find(x=>x.id===id);let n=r.notes;if(st==='Rejected'){n=prompt('Reason for rejection (required):');if(!n||!n.trim())return toast('Rejection needs a reason.')}
+const old=r.status;Object.assign(r,{status:st,notes:st==='Rejected'?n:r.notes,reviewer:st==='Pending Review'?'':who(),rdate:today});log('Evidence review',id,`${old} → ${st}${st==='Rejected'?': '+n:''}`);toast('Evidence '+st.toLowerCase()+'.');tbl('evidence')}
+function del(k,id){if(S.role!=='Admin')return toast('Only administrators can delete records.');if(!confirm(`Delete ${id}? This cannot be undone.`))return;S[k]=S[k].filter(r=>r.id!==id);log('Record deleted',id,E[k].name+' removed');toast('Deleted '+id);route()}
+function form(k,id,pre,custom){const e=E[k],rec=id?S[k].find(r=>r.id===id):Object.assign({status:(e.f.find(f=>f[0]==='status')||[])[3]?.[0]||'',likelihood:3,impact:3},pre||{}),d=$('#dl');
+const fl=custom||e.f;
+d.innerHTML=`<form method="dialog" id="fm"><h3>${custom?'Record assessment':(id?'Edit ':'New ')+e.name.toLowerCase()}</h3>${fl.map(([n,l,t,o,req])=>{const op=typeof o==='function'?o():o;const val=rec[n]??'';return `<label for="f_${n}">${l}${req?' *':''}</label>`+(t==='select'?`<select id="f_${n}" name="${n}">${op.map(x=>{const[a,b]=Array.isArray(x)?x:[x,x||'—'];return `<option value="${esc(a)}" ${a===val?'selected':''}>${esc(b)}</option>`}).join('')}</select>`:t==='textarea'?`<textarea id="f_${n}" name="${n}">${esc(val)}</textarea>`:`<input id="f_${n}" name="${n}" type="${t}" ${t==='number'?'min="1" max="5"':''} value="${esc(val)}" maxlength="200">`)}).join('')}<div class="err" id="er" role="alert"></div><div class="bar" style="margin-top:14px"><span class="sp"></span><button type="button" id="cx">Cancel</button><button class="b1" id="sv">Save</button></div></form>`;
+d.showModal();$('#cx').onclick=()=>d.close();
+$('#fm').onsubmit=ev=>{ev.preventDefault();const o={};new FormData($('#fm')).forEach((x,n)=>o[n]=String(x).trim());
+for(const f of fl){if(f[2]==='number')o[f[0]]=+o[f[0]];if(f[4]&&(o[f[0]]===''||Number.isNaN(o[f[0]])))return $('#er').textContent=f[1]+' is required.'}
+const nr=Object.assign({},rec,o);if(k==='risks'){if(!(o.likelihood>=1&&o.likelihood<=5&&o.impact>=1&&o.impact<=5))return $('#er').textContent='Likelihood and impact must be whole numbers from 1 to 5.';nr.score=nr.likelihood*nr.impact;nr.rating=rate(nr.score)}
+const msg=check(k,nr);if(msg)return $('#er').textContent=msg;
+const ch2=Object.keys(o).filter(n=>String(rec[n]??'')!==String(o[n])).map(n=>`${n}: ${rec[n]??'—'} → ${o[n]}`).join('; ');
+if(k==='controls'){nr.updated=today;if(custom)nr.reviewed=today}
+if(id){Object.assign(rec,nr);log(custom?'Control assessed':e.name+' updated',id,ch2||'No changes')}else{nr.id=e.p+'-'+String(S.n[e.p]++).padStart(3,'0');if(k==='gaps')nr.idate=today;if(k==='controls')nr.reviewed='';nr.updated=today;S[k].unshift(nr);log(e.name+' created',nr.id,nr.title)}
+save();d.close();toast('Saved.');route()}}
+function check(k,r){if(k==='gaps'){if(r.status==='Closed'&&!r.resolution)return 'Closing a gap needs a resolution or verification record.';if(r.status==='Accepted Risk'&&(!r.resolution||!r.due))return 'Accepted risk needs a justification (resolution field) and a review date (target date).'}
+if(k==='evidence'&&r.status==='Rejected'&&!r.notes)return 'Rejected evidence needs a reason in review notes.';
+if(k==='tasks'&&r.status==='Completed'&&!r.notes)return 'Add completion notes before marking a task completed. Completing a task does not make the control compliant; assess the control separately.'}
+const ASM=[['status','Implementation status','select',CS],['note','Assessment note','textarea']];
+function ctlPage(id){const c=ctl(id);if(!c){v.innerHTML='<div class="card empty">Control not found.</div>';return}
+const ev=S.evidence.filter(x=>x.control===id),gp=S.gaps.filter(x=>x.control===id),tk=S.tasks.filter(t=>gp.some(g=>g.id===t.gap)),cm=S.comments.filter(x=>x.c===id),hs=S.audit.filter(a=>a.rec===id);
+const li=(a,f)=>a.length?`<ul class="l">${a.map(f).join('')}</ul>`:'<span class="mu">None yet.</span>';
+head(c.id+' · '+c.title,'Control detail',`Framework: ${c.framework}`,1);
+v.insertAdjacentHTML('beforeend',`<div class="bar"><button class="b1" id="a1">Edit control</button><button id="a2">Add evidence</button><button id="a3">Record assessment</button><button id="a4">Create gap</button><button id="a5">Create remediation task</button></div>
+<div class="grid g2"><div class="card"><h3>Details</h3><p>${esc(c.desc)}</p><p>Category: ${esc(c.category)}<br>Owner: ${esc(c.owner)}<br>Status: ${bdg(c.status)} Risk: ${bdg(c.risk)}<br>Last reviewed: ${esc(c.reviewed)||'—'}<br>Next review: ${esc(c.next)||'—'}</p></div>
+<div class="card"><h3>Evidence</h3>${li(ev,x=>`<li>${esc(x.title)} ${bdg(x.status)}</li>`)}</div><div class="card"><h3>Gaps</h3>${li(gp,x=>`<li>${esc(x.id)} ${esc(x.title)} ${bdg(x.status)}</li>`)}</div>
+<div class="card"><h3>Related remediation tasks</h3>${li(tk,x=>`<li>${esc(x.title)} ${bdg(x.status)}</li>`)}<p class="mu">Completed tasks do not make a control compliant. Record an assessment.</p></div>
+<div class="card"><h3>Notes and comments</h3>${li(cm,x=>`<li>${esc(x.x)} <span class="mu">${esc(x.u)}, ${esc(x.t)}</span></li>`)}<div class="bar"><input id="cm" placeholder="Add a note" aria-label="Add a note"><button id="ac">Add</button></div></div>
+<div class="card"><h3>Change history</h3>${li(hs,x=>`<li>${esc(x.t.slice(0,16).replace('T',' '))} · ${esc(x.act)}: ${esc(x.sum)}</li>`)}</div></div>`);
+$('#a1').onclick=()=>form('controls',id);$('#a2').onclick=()=>form('evidence',null,{control:id});$('#a4').onclick=()=>form('gaps',null,{control:id});$('#a5').onclick=()=>form('tasks',null,{});
+$('#a3').onclick=()=>form('controls',id,{note:''},ASM);
+$('#ac').onclick=()=>{const x=$('#cm').value.trim();if(!x)return toast('Write a note first.');S.comments.push({c:id,x,u:who(),t:today});log('Comment added',id,x.slice(0,60));ctlPage(id)}}
+function head(t,bc,sub,raw){v.innerHTML=`<div class="crumb">AuditMate / ${esc(bc)}</div><h1>${esc(t)}</h1><p class="sub">${esc(sub)}</p>`}
+const COL={g:'#16a34a',w:'#d97706',r:'#dc2626',b:'#2563eb',p:'#7c3aed',n:'#94a3b8'};
+function mk(id,type,labels,data,colors,click){const c=new Chart($('#'+id),{type,data:{labels,datasets:[{data,backgroundColor:colors}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type==='doughnut',position:'bottom'}},scales:type==='bar'?{y:{beginAtZero:true,ticks:{precision:0}}}:{},onClick:(e,a)=>{if(a[0]&&click)click(labels[a[0].index])}}});ch.push(c)}
+const go=(h,f)=>{if(f)V.f[h]=f;if(location.hash==='#'+h)route();else location.hash='#'+h};
+function dash(){const fw=V.fw,cs=S.controls.filter(c=>!fw||c.framework===fw),ids=cs.map(c=>c.id),gp=S.gaps.filter(g=>ids.includes(g.control)&&openGap(g)),tk=S.tasks.filter(t=>{const g=S.gaps.find(x=>x.id===t.gap);return !fw||(g&&ids.includes(g.control))}),ev=S.evidence.filter(e=>ids.includes(e.control));
+const K=[['Total security controls',cs.length,()=>go('controls',{})],['Compliant controls',cs.filter(c=>c.status==='Implemented').length,()=>go('controls',{status:'Implemented'})],['Controls with identified gaps',new Set(gp.map(g=>g.control)).size,()=>go('gaps',{})],['Evidence pending review',ev.filter(e=>e.status==='Pending Review').length,()=>go('evidence',{status:'Pending Review'})],['Open remediation tasks',tk.filter(t=>t.status!=='Completed').length,()=>go('tasks',{})],['Overdue tasks',tk.filter(t=>isOver('tasks',t)).length,()=>{V.s.tasks={c:'due',d:1};go('tasks',{})}]];
+head('Overview Dashboard','Overview Dashboard',NAV[0][3]);
+if(!cs.length){v.insertAdjacentHTML('beforeend','<div class="card empty">No controls yet. Create your first control to see metrics here.</div>');return}
+v.insertAdjacentHTML('beforeend',`<div class="bar"><select id="fwf" aria-label="Framework"><option value="">All frameworks</option>${FW.map(f=>`<option ${f===fw?'selected':''}>${f}</option>`).join('')}</select><select id="win" aria-label="Upcoming review window">${[30,60,90].map(n=>`<option value="${n}" ${V.win==n?'selected':''}>Reviews due in ${n} days</option>`).join('')}</select><span class="mu">Sample data is illustrative.</span></div>
+<div class="grid k6">${K.map((k,i)=>`<button class="card kpi" data-k="${i}"><b>${k[1]}</b><span>${k[0]}</span></button>`).join('')}</div>
+<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Compliance status</h3><div style="height:230px"><canvas id="c1"></canvas></div></div><div class="card"><h3>Controls by category</h3><div style="height:230px"><canvas id="c2"></canvas></div></div><div class="card"><h3>Open gaps by risk level</h3><div style="height:230px"><canvas id="c3"></canvas></div></div><div class="card"><h3>Remediation progress</h3><div style="height:230px"><canvas id="c4"></canvas></div></div>
+<div class="card"><h3>Recently updated controls</h3><ul class="l">${[...cs].sort((a,b)=>b.updated.localeCompare(a.updated)).slice(0,5).map(c=>`<li><a href="#control/${c.id}">${c.id}</a> ${esc(c.title)} ${bdg(c.status)}</li>`).join('')}</ul></div>
+<div class="card"><h3>Latest audit activity</h3><ul class="l">${S.audit.slice(0,5).map(a=>`<li>${esc(a.act)} · ${esc(a.rec)} <span class="mu">${esc(a.t.slice(0,10))}</span></li>`).join('')}</ul></div>
+<div class="card"><h3>Upcoming review deadlines</h3><ul class="l">${cs.filter(c=>c.next&&c.next>=today&&c.next<=dd(+V.win)).sort((a,b)=>a.next.localeCompare(b.next)).slice(0,6).map(c=>`<li>${esc(c.next)} · <a href="#control/${c.id}">${c.id}</a> ${esc(c.title)}</li>`).join('')||'<li class="mu">No reviews due in this window.</li>'}</ul></div></div>`);
+$('#fwf').onchange=e=>{V.fw=e.target.value;route()};$('#win').onchange=e=>{V.win=e.target.value;route()};v.querySelectorAll('[data-k]').forEach(b=>b.onclick=K[b.dataset.k][2]);
+const cnt=(a,k,l)=>l.map(x=>a.filter(r=>r[k]===x).length);
+mk('c1','doughnut',CS,cnt(cs,'status',CS),[COL.n,COL.g,COL.w,COL.r,COL.p,COL.b],s=>go('controls',{status:s}));
+mk('c2','bar',CATS.map(c=>c.split(' ')[0]),CATS.map(c=>cs.filter(x=>x.category===c).length),COL.b);
+mk('c3','bar',RL,cnt(gp,'risk',RL),[COL.g,COL.w,COL.r],null);
+mk('c4','bar',TS,cnt(tk,'status',TS),[COL.n,COL.b,COL.r,COL.w,COL.g],s=>go('tasks',{status:s}))}
+function fws(){head('Compliance Frameworks','Compliance Frameworks',NAV[1][3]);
+v.insertAdjacentHTML('beforeend',`<div class="card" style="margin-bottom:14px">ISO/IEC 27001:2022 is used as a reference. Controls here are <b>illustrative local summaries</b> with internal IDs, not official standard text or identifiers, and do not represent the whole standard. AuditMate does not certify or guarantee compliance.</div><div class="grid g2">${FW.map(f=>{const cs=S.controls.filter(c=>c.framework===f),ids=cs.map(c=>c.id),gp=S.gaps.filter(g=>ids.includes(g.control)&&openGap(g)).length,rv=cs.map(c=>c.reviewed).filter(Boolean).sort().pop()||'—',na=cs.filter(c=>c.status==='Not Assessed').length;
+return `<div class="card"><h3>${esc(f)}</h3><p class="mu">${f===FW[0]?'Reference workspace using illustrative summaries aligned to the 2022 edition themes.':'Organisation-defined baseline for local rules.'}</p><p>Assessment: ${na?'In progress ('+na+' not assessed)':'Assessed'}<br>Mapped controls: ${cs.length}<br>Identified gaps: ${gp}<br>Last review: ${esc(rv)}</p><button class="b1" data-f="${esc(f)}">View details</button></div>`}).join('')}</div>`);
+v.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>go('controls',{framework:b.dataset.f}))}
+function risks(){const m=[...Array(5)].map((_,i)=>5-i);$('#v').insertAdjacentHTML('beforeend',`<div class="card" style="margin-top:14px"><h3>Risk matrix (likelihood rows × impact columns)</h3><div class="mx"><div></div>${[1,2,3,4,5].map(i=>`<div class="mu">${i}</div>`).join('')}${m.map(l=>`<div class="mu">L${l}</div>`+[1,2,3,4,5].map(i=>{const n=S.risks.filter(r=>r.likelihood===l&&r.impact===i).length,cl=rate(l*i)==='High'?'r':rate(l*i)==='Medium'?'w':'g';return `<div class="${cl}">${n||''}</div>`}).join('')).join('')}</div><p class="mu">Score = likelihood × impact (each 1–5). 15–25 High, 8–14 Medium, 1–7 Low. This is an organisational risk rating and is separate from CVSS vulnerability scores. Residual rating is entered by the risk owner, never calculated.</p></div>`)}
+function audit(){head('Audit Activity','Audit Activity',NAV[7][3]);v.insertAdjacentHTML('beforeend',`<div class="bar"><input id="q" placeholder="Search activity" aria-label="Search activity"></div><div class="card tw" style="padding:0"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Record</th><th>Summary</th></tr></thead><tbody id="ab"></tbody></table></div>`);
+const r=()=>{const q=$('#q').value.toLowerCase();$('#ab').innerHTML=S.audit.filter(a=>JSON.stringify(a).toLowerCase().includes(q)).map(a=>`<tr><td>${esc(a.t.slice(0,19).replace('T',' '))}</td><td>${esc(a.u)}</td><td>${esc(a.act)}</td><td>${esc(a.rec)}</td><td style="white-space:normal">${esc(a.sum)}</td></tr>`).join('')};$('#q').oninput=r;r()}
+const san=x=>{x=String(x??'');if(/^[=+\-@\t\r]/.test(x))x="'"+x;return '"'+x.replace(/"/g,'""')+'"'};
+function reports(){head('Reports','Reports',NAV[8][3]);const R={'Overall compliance summary':null,'Control implementation status':'controls','Identified gaps':'gaps','Risk register':'risks','Evidence review':'evidence','Remediation progress':'tasks','Overdue actions':'over'};
+v.insertAdjacentHTML('beforeend',`<div class="bar"><select id="rt" aria-label="Report">${Object.keys(R).map(r=>`<option>${r}</option>`).join('')}</select><select id="rs" aria-label="Status"><option value="">Any status</option>${[...new Set([...CS,...GS,...TS,...ES])].map(s=>`<option>${s}</option>`).join('')}</select><select id="rf" aria-label="Framework"><option value="">All frameworks</option>${FW.map(f=>`<option>${f}</option>`).join('')}</select><select id="rk" aria-label="Risk level"><option value="">Any risk level</option>${RL.map(f=>`<option>${f}</option>`).join('')}</select><input id="ro" placeholder="Owner contains…" aria-label="Owner"><button class="b1" id="go">Generate</button></div><div id="rp"></div>`);
+$('#go').onclick=()=>{const t=$('#rt').value,k=R[t],st=$('#rs').value,fw=$('#rf').value,rk=$('#rk').value,ow=$('#ro').value.toLowerCase();let head2,body;
+if(!k){head2=['Metric','Value'];body=[['Controls',S.controls.length],['Implemented',S.controls.filter(c=>c.status==='Implemented').length],['Open gaps',S.gaps.filter(openGap).length],['Evidence pending',S.evidence.filter(e=>e.status==='Pending Review').length],['Open tasks',S.tasks.filter(x=>x.status!=='Completed').length],['Overdue tasks',S.tasks.filter(x=>isOver('tasks',x)).length]]}
+else{let src=k==='over'?[...S.tasks.filter(x=>isOver('tasks',x)).map(x=>({...x,kind:'Task'})),...S.gaps.filter(x=>isOver('gaps',x)).map(x=>({...x,kind:'Gap'}))]:S[k];const e=E[k==='over'?'tasks':k];
+src=src.filter(r=>(!st||r.status===st)&&(!rk||(r.risk||r.rating)===rk)&&(!ow||(r.owner||'').toLowerCase().includes(ow))&&(!fw||k!=='controls'||r.framework===fw));
+const cols=k==='over'?['kind','id','title','owner','due','status']:e.cols;head2=cols.map(c=>lab(k==='over'?'tasks':k,c));body=src.map(r=>cols.map(c=>r[c]??''))}
+const csv=[head2,...body].map(r=>r.map(san).join(',')).join('\r\n');
+$('#rp').innerHTML=`<div class="card"><h3>${esc(t)}</h3><p class="mu">Generated ${today}. Filters: status=${esc(st||'any')}, framework=${esc(fw||'all')}, risk=${esc(rk||'any')}, owner=${esc(ow||'any')}. Not an official certification report.</p><div class="tw"><table><thead><tr>${head2.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${body.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')||'<tr><td class="empty">No records match these filters.</td></tr>'}</tbody></table></div><h3 style="margin-top:14px">CSV export (formula-safe)</h3><textarea class="csv" readonly aria-label="CSV">${esc(csv)}</textarea><div class="bar"><button id="cp">Copy CSV</button><button id="dl2">Download CSV</button></div></div>`;
+$('#cp').onclick=()=>{try{navigator.clipboard.writeText(csv).then(()=>toast('CSV copied.'),()=>toast('Select the text and copy manually.'))}catch(e){toast('Select the text and copy manually.')}};
+$('#dl2').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='auditmate-report.csv';a.click();toast('If nothing downloads, use Copy CSV.')};
+log('Report generated','—',t)}}
+function settings(){head('Settings','Settings',NAV[9][3]);v.insertAdjacentHTML('beforeend',`<div class="card" style="max-width:520px"><h3>Workspace</h3><label for="so">Organisation name</label><input id="so" value="${esc(S.org)}" style="width:100%" maxlength="60"><label for="sr">Review reminder (days before due)</label><input id="sr" type="number" min="1" max="365" value="${S.rem}" style="width:100%"><div class="err" id="se"></div><div class="bar" style="margin-top:14px"><button class="b1" id="ss">Save settings</button><button id="sx" class="dng">Reset demo data</button></div><p class="mu">Control categories: ${CATS.join(', ')}. Risk rules: High ≥15, Medium 8–14, Low ≤7. Role switch in the top bar is a demo of role-based UI only; real server-side authorisation needs the Flask backend.</p></div>`);
+$('#ss').onclick=()=>{const n=$('#so').value.trim(),r=+$('#sr').value;if(n.length<2)return $('#se').textContent='Organisation name needs at least 2 characters.';if(!(r>=1&&r<=365))return $('#se').textContent='Reminder days must be 1–365.';if(S.role!=='Admin')return $('#se').textContent='Only administrators can change settings.';S.org=n;S.rem=r;log('Settings changed','settings','Organisation: '+n+', reminder: '+r+' days');toast('Settings saved.');route()};
+$('#sx').onclick=()=>{if(S.role==='Admin'&&confirm('Replace all data with the demo set?')){S=seed();save();route()}else if(S.role!=='Admin')toast('Admins only.')}}
+function route(){ch.forEach(c=>c.destroy());ch=[];const [h,id]=(location.hash.slice(1)||'dash').split('/');
+$('#org').textContent=S.org;$('#rl').value=S.role;$('#nv').innerHTML=NAV.map(n=>`<a href="#${n[0]}" class="${(h===n[0]||(h==='control'&&n[0]==='controls'))?'on':''}" title="${n[1]}"><i>${n[2]}</i><span>${n[1]}</span></a>`).join('');
+const n=NAV.find(x=>x[0]===h);if(h==='dash')dash();else if(h==='fw')fws();else if(h==='control')ctlPage(id);else if(h==='audit')audit();else if(h==='reports')reports();else if(h==='settings')settings();else if(E[h]){page(h)}
+if(E[h]){v.insertAdjacentHTML('afterbegin',`<div class="crumb">AuditMate / ${n[1]}</div><h1>${n[1]}</h1><p class="sub">${n[3]}</p>`);if(h==='risks')risks()}}
+$('#tg').onclick=()=>$('#app').classList.toggle('col');if(innerWidth<800)$('#app').classList.add('col');
+$('#rl').onchange=e=>{S.role=e.target.value;log('Role switched','user',S.role);route()};
+$('#nt').onclick=()=>toast(`${S.tasks.filter(t=>isOver('tasks',t)).length} overdue tasks, ${S.evidence.filter(e=>e.status==='Pending Review').length} evidence items awaiting review.`);
+$('#gs').onkeydown=e=>{if(e.key==='Enter'){V.q.controls=e.target.value;go('controls')}};
+addEventListener('hashchange',route);route();
+</script></body></html>
